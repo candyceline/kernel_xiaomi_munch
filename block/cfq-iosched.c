@@ -35,11 +35,11 @@ static const int cfq_slice_async_rq = 2;
 static u64 cfq_slice_idle = 0;
 static u64 cfq_group_idle = 1;
 /* IOPP-cfq_rt_idle_only-v1.0.k4.19 */
-static int cfq_rt_idle_only = 0;
-static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 1/10; /* 100 ms */
+static int cfq_rt_idle_only = 1;
+static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
 static const int cfq_hist_divisor = 4;
 /* IOPP-cfq_max_async_dispatch-v1.0.4.4 */
-static int cfq_max_async_dispatch = 8;
+static int cfq_max_async_dispatch = 4;
 
 /*
  * offset from end of queue service tree for idle class
@@ -3475,6 +3475,7 @@ static inline bool cfq_slice_used_soon(struct cfq_data *cfqd,
 
 	return false;
 }
+
 
 #define CFQ_MAY_DISPATCH_ASYNC(cfqd) \
 	((cfqd)->rq_in_flight[BLK_RW_ASYNC] < (cfqd)->cfq_max_async_dispatch)
