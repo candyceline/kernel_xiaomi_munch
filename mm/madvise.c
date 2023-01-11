@@ -192,8 +192,13 @@ out:
 }
 
 #ifdef CONFIG_SWAP
+#if defined(CONFIG_NANDSWAP) || defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
+int swapin_walk_pmd_entry(pmd_t *pmd, unsigned long start,
+	unsigned long end, struct mm_walk *walk)
+#else
 static int swapin_walk_pmd_entry(pmd_t *pmd, unsigned long start,
 	unsigned long end, struct mm_walk *walk)
+#endif
 {
 	pte_t *orig_pte;
 	struct vm_area_struct *vma = walk->private;
