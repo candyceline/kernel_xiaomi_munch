@@ -1597,8 +1597,13 @@ unsigned long reclaim_clean_pages_from_list(struct zone *zone,
 }
 
 #ifdef CONFIG_PROCESS_RECLAIM
+#if defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
+unsigned long reclaim_pages_from_list(struct list_head *page_list,
+			struct vm_area_struct *vma, struct mm_walk *walk)
+#else
 unsigned long reclaim_pages_from_list(struct list_head *page_list,
 					struct vm_area_struct *vma)
+#endif
 {
 	struct scan_control sc = {
 		.gfp_mask = GFP_KERNEL,
