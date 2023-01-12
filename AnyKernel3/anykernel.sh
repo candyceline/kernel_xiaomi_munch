@@ -4,14 +4,14 @@
 ### AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=ExampleKernel by osm0sis @ xda-developers
+kernel.string=Oxygen+ by Danda
 do.devicecheck=1
 do.modules=0
 do.systemless=1
 do.cleanup=1
 do.cleanuponabort=0
-device.name1=maguro
-device.name2=toro
+device.name1=munch
+device.name2=munchin
 device.name3=toroplus
 device.name4=tuna
 device.name5=
