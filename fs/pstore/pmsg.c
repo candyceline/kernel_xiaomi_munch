@@ -76,7 +76,7 @@ static ssize_t pmsg_write(char *buf, size_t count)
 
 	rt_mutex_lock(&pmsg_lock);
 	ret = psinfo->write(&record);
-	rt_mutex_lock(&pmsg_lock);
+	rt_mutex_unlock(&pmsg_lock);
 	return ret ? ret : count;
 }
 
