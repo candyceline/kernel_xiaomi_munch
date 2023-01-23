@@ -29,8 +29,6 @@
 struct memlat_node {
 	unsigned int ratio_ceil;
 	unsigned int stall_floor;
-	unsigned int wb_pct_thres;
-	unsigned int wb_filter_ratio;
 	bool mon_started;
 	bool already_zero;
 	struct list_head list;
@@ -154,8 +152,7 @@ static int start_monitor(struct devfreq *df)
 		return ret;
 	}
 
-	if (!hw->should_ignore_df_monitor)
-		devfreq_monitor_start(df);
+	devfreq_monitor_start(df);
 
 	node->mon_started = true;
 
@@ -169,9 +166,7 @@ static void stop_monitor(struct devfreq *df)
 
 	node->mon_started = false;
 
-	if (!hw->should_ignore_df_monitor)
-		devfreq_monitor_stop(df);
-
+	devfreq_monitor_stop(df);
 	hw->stop_hwmon(hw);
 }
 
@@ -215,12 +210,10 @@ err_start:
 static int gov_suspend(struct devfreq *df)
 {
 	struct memlat_node *node = df->data;
-	struct memlat_hwmon *hw = node->hw;
 	unsigned long prev_freq = df->previous_freq;
 
 	node->mon_started = false;
-	if (!hw->should_ignore_df_monitor)
-		devfreq_monitor_suspend(df);
+	devfreq_monitor_suspend(df);
 
 	mutex_lock(&df->lock);
 	update_devfreq(df);
@@ -234,7 +227,6 @@ static int gov_suspend(struct devfreq *df)
 static int gov_resume(struct devfreq *df)
 {
 	struct memlat_node *node = df->data;
-	struct memlat_hwmon *hw = node->hw;
 
 	mutex_lock(&df->lock);
 	update_devfreq(df);
@@ -242,8 +234,7 @@ static int gov_resume(struct devfreq *df)
 
 	node->resume_freq = 0;
 
-	if (!hw->should_ignore_df_monitor)
-		devfreq_monitor_resume(df);
+	devfreq_monitor_resume(df);
 	node->mon_started = true;
 
 	return 0;
@@ -298,14 +289,11 @@ static int devfreq_memlat_get_freq(struct devfreq *df,
 					hw->core_stats[i].inst_count,
 					hw->core_stats[i].mem_count,
 					hw->core_stats[i].freq,
-					hw->core_stats[i].stall_pct,
-					hw->core_stats[i].wb_pct, ratio);
+					hw->core_stats[i].stall_pct, ratio);
 
-		if (((ratio <= node->ratio_ceil
-		      && hw->core_stats[i].stall_pct >= node->stall_floor) ||
-		      (hw->core_stats[i].wb_pct >= node->wb_pct_thres
-		      && ratio <= node->wb_filter_ratio))
-		      && (hw->core_stats[i].freq > max_freq)) {
+		if (ratio <= node->ratio_ceil
+		    && hw->core_stats[i].stall_pct >= node->stall_floor
+		    && hw->core_stats[i].freq > max_freq) {
 			lat_dev = i;
 			max_freq = hw->core_stats[i].freq;
 		}
@@ -329,16 +317,12 @@ static int devfreq_memlat_get_freq(struct devfreq *df,
 	return 0;
 }
 
-gov_attr(ratio_ceil, 1U, 50000U);
+gov_attr(ratio_ceil, 1U, 20000U);
 gov_attr(stall_floor, 0U, 100U);
-gov_attr(wb_pct_thres, 0U, 100U);
-gov_attr(wb_filter_ratio, 0U, 50000U);
 
 static struct attribute *memlat_dev_attr[] = {
 	&dev_attr_ratio_ceil.attr,
 	&dev_attr_stall_floor.attr,
-	&dev_attr_wb_pct_thres.attr,
-	&dev_attr_wb_filter_ratio.attr,
 	&dev_attr_freq_map.attr,
 	NULL,
 };
@@ -358,15 +342,13 @@ static struct attribute_group compute_dev_attr_group = {
 	.attrs = compute_dev_attr,
 };
 
-#define MIN_MS	0U
+#define MIN_MS	10U
 #define MAX_MS	500U
 static int devfreq_memlat_ev_handler(struct devfreq *df,
 					unsigned int event, void *data)
 {
 	int ret;
 	unsigned int sample_ms;
-	struct memlat_node *node;
-	struct memlat_hwmon *hw;
 
 	switch (event) {
 	case DEVFREQ_GOV_START:
@@ -414,15 +396,10 @@ static int devfreq_memlat_ev_handler(struct devfreq *df,
 		break;
 
 	case DEVFREQ_GOV_INTERVAL:
-		node = df->data;
-		hw = node->hw;
 		sample_ms = *(unsigned int *)data;
 		sample_ms = max(MIN_MS, sample_ms);
 		sample_ms = min(MAX_MS, sample_ms);
-		if (hw->request_update_ms)
-			hw->request_update_ms(hw, sample_ms);
-		if (!hw->should_ignore_df_monitor)
-			devfreq_interval_update(df, &sample_ms);
+		devfreq_interval_update(df, &sample_ms);
 		break;
 	}
 
@@ -501,8 +478,6 @@ static struct memlat_node *register_common(struct device *dev,
 		return ERR_PTR(-ENOMEM);
 
 	node->ratio_ceil = 10;
-	node->wb_pct_thres = 100;
-	node->wb_filter_ratio = 25000;
 	node->hw = hw;
 
 	if (hw->get_child_of_node) {
