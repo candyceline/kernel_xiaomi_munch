@@ -1391,7 +1391,7 @@ static int lpm_cpuidle_enter(struct cpuidle_device *dev,
 	cpu_prepare(cpu, idx, true);
 	cluster_prepare(cpu->parent, cpumask, idx, true, 0);
 
-	trace_cpu_idle_enter(idx);
+t	race_cpu_idle_enter(idx);
 	lpm_stats_cpu_enter(idx, 0);
 
 	if (need_resched())

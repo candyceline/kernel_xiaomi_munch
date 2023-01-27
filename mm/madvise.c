@@ -212,7 +212,11 @@ static int swapin_walk_pmd_entry(pmd_t *pmd, unsigned long start,
 		swp_entry_t entry;
 		struct page *page;
 		spinlock_t *ptl;
-
+		
+#if defined(CONFIG_NANDSWAP) || defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
+		if (!list_empty(&vma->vm_mm->mmap_sem.wait_list))
+			return -1;
+#endif
 		orig_pte = pte_offset_map_lock(vma->vm_mm, pmd, start, &ptl);
 		pte = *(orig_pte + ((index - start) / PAGE_SIZE));
 		pte_unmap_unlock(orig_pte, ptl);
