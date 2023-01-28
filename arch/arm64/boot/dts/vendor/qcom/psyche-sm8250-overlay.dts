@@ -6,10 +6,10 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 
-#include "thyme-sm8250.dtsi"
-#include "thyme-sm8250-camera-sensor-mtp.dtsi"
+#include "psyche-sm8250.dtsi"
+#include "psyche-sm8250-camera-sensor-mtp.dtsi"
 / {
-	model = "Qualcomm Technologies, Inc. xiaomi thyme";
+	model = "Qualcomm Technologies, Inc. xiaomi psyche";
 	compatible = "qcom,kona-mtp", "qcom,kona", "qcom,mtp";
-	qcom,board-id = <45 0>;
+	qcom,board-id = <48 0>;
 };

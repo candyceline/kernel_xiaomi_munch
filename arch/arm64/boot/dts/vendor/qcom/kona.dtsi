@@ -55,9 +55,6 @@
 		swr0 = &swr0;
 		swr1 = &swr1;
 		swr2 = &swr2;
-		swr_ar0 = &swr_ar0;
-		swr_ar1 = &swr_ar1;
-		swr_ar2 = &swr_ar2;
 		mhi-netdev0 = &mhi_netdev_0;
 	};
 
@@ -290,20 +287,24 @@
 				core3 {
 					cpu = <&CPU3>;
 				};
+			};
 
-				core4 {
+			cluster1 {
+				core0 {
 					cpu = <&CPU4>;
 				};
 
-				core5 {
+				core1 {
 					cpu = <&CPU5>;
 				};
 
-				core6 {
+				core2 {
 					cpu = <&CPU6>;
 				};
+			};
 
-				core7 {
+			cluster2 {
+				core0 {
 					cpu = <&CPU7>;
 				};
 			};
@@ -346,7 +347,7 @@
 	};
 
 	chosen {
-		bootargs = "quiet noirqdebug nodebugmon rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off cgroup_disable=pressure threadirqs";
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off";
 	};
 
 	firmware: firmware {
@@ -392,7 +393,7 @@
 			no-map;
 		};
 
-		reserved_xbl_uefi_log: res_xbl_uefi_log_region {
+		reserved_xbl_uefi_log: res_xbl_uefi_log_region@80880000 {
 			compatible = "removed-dma-pool";
 			no-map;
 			reg = <0x0 0x80880000 0x0 0x14000>;
@@ -777,7 +778,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU0>;
-		status = "disabled";
 	};
 
 	jtag_mm1: jtagmm@7140000 {
@@ -789,7 +789,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU1>;
-		status = "disabled";
 	};
 
 	jtag_mm2: jtagmm@7240000 {
@@ -801,7 +800,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU2>;
-		status = "disabled";
 	};
 
 	jtag_mm3: jtagmm@7340000 {
@@ -813,7 +811,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU3>;
-		status = "disabled";
 	};
 
 	jtag_mm4: jtagmm@7440000 {
@@ -825,7 +822,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU4>;
-		status = "disabled";
 	};
 
 	jtag_mm5: jtagmm@7540000 {
@@ -837,7 +833,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU5>;
-		status = "disabled";
 	};
 
 	jtag_mm6: jtagmm@7640000 {
@@ -849,7 +844,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU6>;
-		status = "disabled";
 	};
 
 	jtag_mm7: jtagmm@7740000 {
@@ -861,7 +855,6 @@
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU7>;
-		status = "disabled";
 	};
 
 	qcom,devfreq-l3 {
@@ -3328,7 +3321,7 @@
 
 		/* PM QoS */
 		qcom,pm-qos-cpu-groups = <0x0f 0xf0>;
-		qcom,pm-qos-cpu-group-latency-us = <100 100>;
+		qcom,pm-qos-cpu-group-latency-us = <70 70>;
 		qcom,pm-qos-default-cpu = <0>;
 
 		/*
@@ -3809,7 +3802,7 @@
 
 				msm_cdsp_rm: qcom,msm_cdsp_rm {
 					compatible = "qcom,msm-cdsp-rm";
-					qcom,qos-latency-us = <67>;
+					qcom,qos-latency-us = <44>;
 					qcom,qos-maxhold-ms = <20>;
 					qcom,compute-cx-limit-en;
 					qcom,compute-priority-mode = <2>;
@@ -5193,7 +5186,6 @@
 #include "camera/kona-camera.dtsi"
 #include "kona-qupv3.dtsi"
 #include "kona-audio.dtsi"
-#include "kona-audio-ar.dtsi"
 #include "kona-thermal.dtsi"
 #include "kona-vidc.dtsi"
 #include "kona-cvp.dtsi"
