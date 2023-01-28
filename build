@@ -2,10 +2,10 @@
 DEVICE=munch
 cd ..
 MAIN=$PWD
-cd kernel_xiaomi_${DEVICE}
+cd kernel_xiaomi_munch
 KERNEL_DIR=$PWD
 ANYKERNEL_DIR=$KERNEL_DIR/AnyKernel3
-CLANG_DIR=$MAIN/zyc-clang
+CLANG_DIR=$MAIN/weebx-clang
 DEFCONFIG=${DEVICE}_defconfig
 KERNELVER=$(make kernelversion)
 
@@ -15,19 +15,22 @@ if [[ -z "${JTHREAD}" ]]; then
 fi
 
 echo "cleaning..."
+rm -rf out/
 mkdir -p out
 clear
 BUILD_START=$(date +"%s")
+DATE_CLOCK=$(date +'%H%M-%d%m%Y')
 
 make O=out ARCH=arm64 $DEFCONFIG
 
 PATH="$CLANG_DIR/bin:${PATH}" \
-make     O=out \
+make    O=out \
     ARCH=arm64 \
     CC=clang \
     LLVM=1 \
     LLVM_IAS=1 \
     CROSS_COMPILE=aarch64-linux-gnu- \
+    CLANG_TRIPLE=aarch64-linux-gnu- \
     CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
     -j${JTHREAD}
 
@@ -37,7 +40,6 @@ if [[ -f $KERNEL_DIR/out/arch/arm64/boot/Image ]]; then
  cd $ANYKERNEL_DIR
  echo ""
  echo "zipping"
- DATE_CLOCK=$(date +'%H%M-%d%m%Y')
  ZIPNAME=$KERNELVER-Oxygen+-$DATE_CLOCK.zip
  zip -r9 $ZIPNAME META-INF ramdisk tools anykernel.sh banner Image.gz-dtb dtbo.img
  mv $ZIPNAME $KERNEL_DIR/
