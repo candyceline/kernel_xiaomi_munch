@@ -21,12 +21,17 @@ clear
 BUILD_START=$(date +"%s")
 DATE_CLOCK=$(date +'%H%M-%d%m%Y')
 
-make O=out ARCH=arm64 $DEFCONFIG
+export PATH="$CLANG_DIR/bin:${PATH}"
 
-PATH="$CLANG_DIR/bin:${PATH}" \
-make    O=out \
+make O=out ARCH=arm64 $DEFCONFIG \
     ARCH=arm64 \
-    CC=clang \
+    LLVM=1 \
+    LLVM_IAS=1 \
+    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+    
+make O=out \
+    ARCH=arm64 \
     LLVM=1 \
     LLVM_IAS=1 \
     CROSS_COMPILE=aarch64-linux-gnu- \
