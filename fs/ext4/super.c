@@ -6344,6 +6344,10 @@ static int __init ext4_init_fs(void)
 	err = ext4_init_es();
 	if (err)
 		return err;
+	
+	err = ext4_init_post_read_processing();
+	if (err)
+		goto out6;
 
 	err = ext4_init_pageio();
 	if (err)
@@ -6383,6 +6387,8 @@ out3:
 out4:
 	ext4_exit_pageio();
 out5:
+	ext4_exit_post_read_processing();
+out6:
 	ext4_exit_es();
 
 	return err;
