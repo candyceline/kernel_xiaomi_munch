@@ -14,6 +14,7 @@ export KBUILD_BUILD_HOST=fedora # Change with your own hostname.
 IMAGE=$(pwd)/munch/out/arch/arm64/boot/Image
 DATE=$(date +"%F-%S")
 START=$(date +"%s")
+PATH="${PATH}:${CLANG_ROOTDIR}/bin"
 
 # Checking environtment
 # Warning !! Dont Change anything there without known reason.
